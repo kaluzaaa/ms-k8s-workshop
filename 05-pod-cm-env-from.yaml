@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kuard-config
+data:
+  APP1: "Demo!"
+  SVC_XYZ: "moto.host.xyz"
+  WPIS_3: "cos tam"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard
+  labels:
+    name: kuard
+spec:
+  containers:
+  - name: kuard
+    image: gcr.io/kuar-demo/kuard-amd64:1
+    envFrom:
+    - configMapRef:
+        name: kuard-config
