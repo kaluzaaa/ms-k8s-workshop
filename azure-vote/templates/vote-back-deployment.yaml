@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.back.name }}
+  labels:
+    {{- include "azure-vote.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.back.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.back.name }}
+    spec:
+      containers:
+      - name: azure-vote-back
+        image: "{{ .Values.back.image.repository }}:{{ .Values.back.image.tag }}"
+        imagePullPolicy: {{ .Values.back.image.pullPolicy }}
+        env:
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        ports:
+        - containerPort: 6379
+          name: redis

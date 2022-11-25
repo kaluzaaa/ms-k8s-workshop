@@ -1,0 +1,15 @@
+# Default values for azure-vote.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+front:
+  replicaCount: 2
+  image:
+    repository: mcr.microsoft.com/azuredocs/azure-vote-front
+    pullPolicy: Always
+  port: 9090
+
+back:
+  image:
+    repository: mcr.microsoft.com/oss/bitnami/redis
+    pullPolicy: Always
+    tag: "6.0.8"

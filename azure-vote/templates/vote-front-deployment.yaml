@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.front.name }}
+  labels:
+    {{- include "azure-vote.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.front.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.front.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.front.name }}
+    spec:
+      containers:
+      - name: azure-vote-front
+        image: "{{ .Values.front.image.repository }}:{{ .Values.front.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.front.image.pullPolicy }}
+        env:
+        - name: REDIS
+          value: "{{ .Values.back.name }}"
+        - name: DEMO
+          value: TEST         
+        ports:
+        - containerPort: 80
+          name: http
