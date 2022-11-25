@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: helloapp
+  template:
+    metadata:
+      labels:
+        app: helloapp
+    spec:
+      containers:
+      - name: srv
+        image: poznajkubernetes/helloapp:svc
+        resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloapp
+spec:
+  selector:
+    app: helloapp
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+  - port: 8080
+    targetPort: 8080
+    name: http8080

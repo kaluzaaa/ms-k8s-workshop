@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: appsettings
+data:
+  appsettings.json: ewogICAgIkxvZ2dpbmciOiB7CiAgICAgICAgIkxvZ0xldmVsIjogewogICAgICAgICAgICAiRGVmYXVsdCI6ICJJbmZvcm1hdGlvbiIsCiAgICAgICAgICAgICJNaWNyb3NvZnQuQXNwTmV0Q29yZSI6ICJXYXJuaW5nIgogICAgICAgIH0KICAgIH0sCiAgICAiQWxsb3dlZEhvc3RzIjogIioiCn0=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kuard-config
+data:
+  APP1: "Demo!"
+  SVC_XYZ: "moto.host.xyz"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuard
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: kuard
+  template:
+    metadata:
+      labels:
+        app: kuard
+    spec:
+      containers:
+      - name: kuard
+        image: gcr.io/kuar-demo/kuard-amd64:2
+        env:
+          - name: DEMO
+            value: "test123"
+          - name: TEST
+            value: "Moto jest super!"
+          - name: APP1
+            valueFrom:
+              configMapKeyRef:
+                name: kuard-config
+                key: APP1
+          - name: SVC
+            valueFrom:
+              configMapKeyRef:
+                name: kuard-config
+                key: SVC_XYZ
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /healthy
+            port: 8080
+          failureThreshold: 5
+          periodSeconds: 10
+          initialDelaySeconds: 15
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          failureThreshold: 3
+          periodSeconds: 5
+          initialDelaySeconds: 30
+          successThreshold: 2
+        volumeMounts:
+          - mountPath: /app/
+            name: config
+      volumes:
+        - name: config
+          secret:
+            secretName: appsettings

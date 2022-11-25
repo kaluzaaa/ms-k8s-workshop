@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloapp-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: helloapp-1
+  template:
+    metadata:
+      labels:
+        app: helloapp-1
+        tier: front
+    spec:
+      containers:
+      - name: srv
+        image: poznajkubernetes/helloapp:svc
+        resources: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: helloapp
+spec:
+  selector:
+    app: helloapp-1
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-1
+  template:
+    metadata:
+      labels:
+        app: nginx-1
+        tier: front
+    spec:
+      containers:
+      - name: srv
+        image: nginx
+        resources: {}
